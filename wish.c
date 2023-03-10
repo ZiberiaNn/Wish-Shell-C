@@ -20,6 +20,7 @@ int main(int argc, char *argv[]){
 	do{
      		printf("whish> ");
      		fgets(str, MAX_SIZE, stdin);
+			printf("%s",str);
 		s = str;
                 while(*s != '\n') {
                 	++s;
