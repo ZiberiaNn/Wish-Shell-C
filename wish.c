@@ -13,22 +13,51 @@ char *mypath[] = {"/bin/", ""};
 
 int main(int argc, char *argv[])
 {
-    char *line;
     char *command_string;
     char *command_args;
     int fd;
-    // Leer los comandos del usuario
-    while ((line = readline("whish> ")) != NULL)
-    {
-        int newline_pos = strcspn(line, "\n");
-        printf("%c", line[newline_pos]);
-        line[newline_pos] = '\0';
-        // Almacenar el comando en el historial
-        add_history(line);
 
-        command_args=line;
+    char *line;
+
+    // Estos atributos son para el batch mode
+    FILE *fp;
+    size_t len = 0;
+    ssize_t read;
+    if (argc == 2) // Si hay 2 argumentos, significa que se entro un archivo para el batchmode
+    {
+        fp = fopen(argv[1], "r"); // Se intenta abrir el archivo que se entro como argumento
+        if (fp == NULL)
+        {
+            printf("Error al abrir el archivo.\n");
+            return 1;
+        }
+    }
+
+    // Leer los comandos del usuario
+    while (1)
+    {
+        if (argc == 1) // Se ejecuta esta linea en modo interactivo (no se ingreso un argumento para el batchmode)
+        {
+            line = readline("wish> "); //Se imprime wish y se recibe la entrada del usuario en line
+            int newline_pos = strcspn(line, "\n");
+            line[newline_pos] = '\0';
+            add_history(line); // Almacenar el comando en el historial
+        }
+        else if (argc == 2) // Si hay 2 argumentos, significa que se entro un archivo para el batchmode
+        {
+            read = getline(&line, &len, fp); //Se lee cada linea del archivo batch
+            int newline_pos = strcspn(line, "\n");
+            line[newline_pos] = '\0';
+        }
+
+        command_args = line;
         command_string = strtok_r(command_args, " ", &command_args);
-        if (strcmp(command_string, "exit") == 0)
+
+        if (command_string == NULL)
+        {
+            continue;
+        }
+        else if (strcmp(command_string, "exit") == 0)
         {
             execute_exit(0);
         }
@@ -77,5 +106,7 @@ int main(int argc, char *argv[])
             }
         }
     }
+    free(line);
+    fclose(fp);
     return 0;
 }
