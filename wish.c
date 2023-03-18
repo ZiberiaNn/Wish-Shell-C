@@ -13,6 +13,9 @@ char *mypath[] = {"/bin/", ""};
 
 int main(int argc, char *argv[])
 {
+    if(argc>2){
+        exit(1);
+    }
     char *command_string;
     char *command_args;
     int fd;
@@ -29,7 +32,7 @@ int main(int argc, char *argv[])
         if (fp == NULL)
         {
             printf("Error al abrir el archivo.\n");
-            return 1;
+            exit(1);
         }
     }
 
@@ -52,7 +55,6 @@ int main(int argc, char *argv[])
 
         command_args = line;
         command_string = strtok_r(command_args, " ", &command_args);
-
         if (command_string == NULL)
         {
             continue;
@@ -91,7 +93,7 @@ int main(int argc, char *argv[])
                 {
                     char *myargs[3];
                     myargs[0] = strdup(specificpath);
-                    myargs[1] = strdup(".");
+                    myargs[1] = strdup(command_args);
                     myargs[2] = NULL;
                     execvp(myargs[0], myargs);
                 }
