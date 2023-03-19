@@ -11,6 +11,7 @@
 
 void printStderr();
 char *mypath[] = {"/bin/", ""};
+char error_message[30] = "An error has occurred\n";
 
 int main(int argc, char *argv[])
 {
@@ -34,8 +35,7 @@ int main(int argc, char *argv[])
         fp = fopen(argv[1], "r"); // Se intenta abrir el archivo que se entro como argumento
         if (fp == NULL)
         {
-                char error_message[30] = "An error has occurred\n";
-    write(STDERR_FILENO, error_message, strlen(error_message)); 
+            write(STDERR_FILENO, error_message, strlen(error_message)); 
             exit(1);
         }
     }
@@ -59,11 +59,13 @@ int main(int argc, char *argv[])
             int newline_pos = strcspn(line, "\n");
             line[newline_pos] = '\0';
         }
-
+ 
+        // Se separa el comando del argumento
         command_args = line;
         command_string = strtok_r(command_args, " ", &command_args);
         if (command_string == NULL) // Si no se entra ningún comando, empieza el loop de nuevo
         {
+            write(STDERR_FILENO, error_message, strlen(error_message));
             continue;
         }
         else if (command_args[0] == 0 || command_args[0] == 32) // Si no se entra ningún argumento al comando, se coloca argumento "."
@@ -78,6 +80,11 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(command_string, "cd") == 0)
         {
+            // Al no tener argumentos, se coloca el argumento "." y se imprime un error
+            if(strcmp(command_args,".") == 0){
+                write(STDERR_FILENO, error_message, strlen(error_message));
+                continue;
+            }
             execute_cd(command_args);
         }
         else if (strcmp(command_string, "path") == 0)
