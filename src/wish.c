@@ -76,6 +76,10 @@ int main(int argc, char *argv[])
 
         if (strcmp(command_string, "exit") == 0)
         {
+            if(strcmp(command_args,".") != 0){
+                write(STDERR_FILENO, error_message, strlen(error_message));
+                continue;
+            }
             execute_exit(0);
         }
         else if (strcmp(command_string, "cd") == 0)
@@ -116,6 +120,7 @@ int main(int argc, char *argv[])
                     myargs[0] = strdup(specificpath);
                     myargs[1] = strdup(command_args);
                     myargs[2] = NULL;
+                    //TODO: Implementar validación de path al ejecutar LS(Test 3)
                     execvp(myargs[0], myargs);
                 }
                 else
