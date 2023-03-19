@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(command_string, "path") == 0)
         {
-            execute_path();
+            execute_path(command_args);
         }
         else
         {
