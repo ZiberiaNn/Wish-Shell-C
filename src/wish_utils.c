@@ -10,6 +10,12 @@ void execute_exit(int value){
 
 void execute_cd(char *newpath){
 	char *path = strtok_r(newpath, " ", &newpath);
+	printf("path: %s", path);
+	//Intenta ir a la dirección, si la dirección no es valida, imprime un error.
+	if(chdir(path) != 0){
+		write(STDERR_FILENO, error_message, strlen(error_message));
+		return;
+	}
 	chdir(path);
 }
 
