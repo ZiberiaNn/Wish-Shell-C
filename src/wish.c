@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
 {
     if (argc > 2)
     {
+        write(STDERR_FILENO, error_message, strlen(error_message));
         exit(1);
     }
     char *command_string;
