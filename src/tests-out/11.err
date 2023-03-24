@@ -1,0 +1,4 @@
+/bin/ls: no se puede acceder a 'tests/p2a-test > /tmp/output11': No existe el archivo o el directorio
+/bin/cat: /tmp/output11: No existe el archivo o el directorio
+/bin/rm: opción incorrecta -- « »
+Pruebe '/bin/rm --help' para más información.

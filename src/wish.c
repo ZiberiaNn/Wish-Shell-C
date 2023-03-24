@@ -4,12 +4,13 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/wait.h>
+#include <ctype.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "wish_utils.c"
 #define MAX_SIZE 100
 
-void printStderr();
+char *trimString();
 char *mypath[] = {"/bin/", ""};
 char error_message[30] = "An error has occurred\n";
 
@@ -62,7 +63,7 @@ int main(int argc, char *argv[])
         }
  
         // Se separa el comando del argumento
-        command_args = line;
+        command_args = trimString(line); //Elimina espacios en blanco
         command_string = strtok_r(command_args, " ", &command_args);
         if (command_string == NULL) // Si no se entra ningún comando, empieza el loop de nuevo
         {
@@ -73,7 +74,6 @@ int main(int argc, char *argv[])
             command_args = malloc(strlen(".") + 1);
             strcpy(command_args, ".");
         }
-
         if (strcmp(command_string, "exit") == 0)
         {
             if(strcmp(command_args,".") != 0){
@@ -140,6 +140,19 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void printStderr(){
-
+//Elimina espacios en blanco
+char *trimString(char *str){
+    char *end;
+    while(isspace((unsigned char)*str)){
+		str++;
+	}
+    if(*str == 0){
+        return str;
+	}
+    end = str + strlen(str) - 1;
+    while(end > str && isspace((unsigned char)*end)){
+		end--;
+	} 
+    end[1] = '\0';
+    return str;
 }
