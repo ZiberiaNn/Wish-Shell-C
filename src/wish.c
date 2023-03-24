@@ -66,7 +66,6 @@ int main(int argc, char *argv[])
         command_string = strtok_r(command_args, " ", &command_args);
         if (command_string == NULL) // Si no se entra ningún comando, empieza el loop de nuevo
         {
-            write(STDERR_FILENO, error_message, strlen(error_message));
             continue;
         }
         else if (command_args[0] == 0 || command_args[0] == 32) // Si no se entra ningún argumento al comando, se coloca argumento "."
