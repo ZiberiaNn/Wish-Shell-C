@@ -7,38 +7,47 @@
 extern char *mypath[];
 extern char error_message[];
 #define MAX_FILENAME 1024
-int num_paths = 2;
 
-void execute_exit(int value){
-	exit(0);
+void execute_exit(int value)
+{
+    exit(0);
 }
 
-void execute_cd(char *newpath){
-	char *path = strtok_r(newpath, " ", &newpath);;
-	//Intenta ir a la dirección, si la dirección no es valida, imprime un error.
-	if(chdir(path) != 0){
-		write(STDERR_FILENO, error_message, strlen(error_message));
-		return;
-	}
-	chdir(path);
-}
-
-void execute_path( char *newpath){
-char *full_path = malloc(MAX_FILENAME);
-    if (full_path == NULL) {
+void execute_cd(char *newpath)
+{
+    char *path = strtok_r(newpath, " ", &newpath);
+    ;
+    // Intenta ir a la dirección, si la dirección no es valida, imprime un error.
+    if (chdir(path) != 0)
+    {
         write(STDERR_FILENO, error_message, strlen(error_message));
-		return;
+        return;
+    }
+    chdir(path);
+}
+
+void execute_path(char *newpath)
+{
+    // Valida que el formato del new path sea correcto (Debe terminar con "/")
+    if (strchr(newpath, '/') == NULL)
+    {
+        // Si el formato del new path es incorrecto, añade un "/" al final
+        newpath = strcat(newpath, "/");
     }
 
-    for (int i = 0; i < num_paths; i++) {
-        snprintf(full_path, MAX_FILENAME, "%s/%s", mypath[i], newpath);
-        if (access(full_path, X_OK) == 0) {
-			fprintf(stderr, "El archivo %s se encuentra en la ruta de búsqueda\n", newpath);
-			free(full_path);
+    // Insertar el objeto "newpath" en la variable "mypath"
+    int i = 0;
+    while (mypath[i] != NULL)
+    {
+        // Si el objeto "newpath" ya existe en la variable "mypath", no se inserta
+        if (strcmp(mypath[i], newpath) == 0)
+        {
+            fprintf(stderr, "Error: %s already exists in path\n", newpath);
             return;
         }
+        i++;
     }
-
-    write(STDERR_FILENO, error_message, strlen(error_message));
-    free(full_path);
+    // Si el objeto "newpath" no existe en la variable "mypath", se inserta
+    mypath[i] = newpath;
+    mypath[i+1] = NULL;
 }
