@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
         // Se separa el comando del argumento
         command_args = line;
         command_args = strcat(command_args, " ");
-        // command_args = trimString(line); //Elimina espacios en blanco
+        command_args = trimString(line); //Elimina espacios en blanco
         command_string = strtok_r(command_args, " ", &command_args);
         if (command_string == NULL) // Si no se entra ningún comando, empieza el loop de nuevo
         {
