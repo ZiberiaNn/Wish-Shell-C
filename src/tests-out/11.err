@@ -1,4 +1,0 @@
-/bin/ls: cannot access 'tests/p2a-test > /tmp/output11': No such file or directory
-/bin/cat: /tmp/output11: No such file or directory
-/bin/rm: invalid option -- ' '
-Try '/bin/rm --help' for more information.
