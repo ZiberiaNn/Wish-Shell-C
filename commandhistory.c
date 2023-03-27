@@ -24,13 +24,12 @@ void restore_terminal_mode(struct termios *old_term)
     tcsetattr(STDIN_FILENO, TCSANOW, old_term);
 }
 
-void navigate_command_history(char *history[], int *history_count, int *history_idx, char *line, int *line_idx)
+void navigate_command_history(char *history[], char *line, int *history_count, int *history_idx, int *line_idx, char *ch)
 {
-    char ch;
-    ch = getchar(); // '[' character
-    ch = getchar(); // Arrow key code
+    *ch = getchar(); // '[' character
+    *ch = getchar(); // Arrow key code
 
-    if (ch == 'A')
+    if (*ch == 'A')
     { // Up arrow key
         if (*history_count > 0 && *history_idx > 0)
         {
@@ -42,7 +41,7 @@ void navigate_command_history(char *history[], int *history_count, int *history_
             fflush(stdout);
         }
     }
-    else if (ch == 'B')
+    else if (*ch == 'B')
     { // Down arrow key
         if (*history_count > 0 && *history_idx < *history_count - 1)
         {
@@ -53,6 +52,18 @@ void navigate_command_history(char *history[], int *history_count, int *history_
             printf("\033[2K\r%s", line);
             fflush(stdout);
         }
+    }
+}
+
+void handle_backspace_key(char *line, int *line_idx)
+{
+    if (*line_idx > 0)
+    {
+        putchar('\b');
+        putchar(' ');
+        putchar('\b');
+        (*line_idx)--;
+        line[*line_idx] = 0;
     }
 }
 
@@ -82,6 +93,16 @@ void add_command_to_history(char *history[], char *line, int *line_idx, int *his
     *line_idx = 0;
 }
 
+void handle_input(char *line, int *line_idx, char *ch)
+{
+    if (*line_idx < MAX_LINE_LENGTH - 1)
+    {
+        putchar(*ch);
+        line[*line_idx] = *ch;
+        (*line_idx)++;
+    }
+}
+
 int main()
 {
     char ch;
@@ -101,7 +122,7 @@ int main()
 
         if (ch == '\033')
         { // Escape sequence
-            navigate_command_history(history, &history_count, &history_idx, line, &line_idx);
+            navigate_command_history(history, line, &history_count, &history_idx, &line_idx, &ch);
         }
         else if (ch == '\n')
         { // Enter key
@@ -111,23 +132,11 @@ int main()
         }
         else if (ch == 127)
         { // Backspace key
-            if (line_idx > 0)
-            {
-                putchar('\b');
-                putchar(' ');
-                putchar('\b');
-                line_idx--;
-                line[line_idx] = 0;
-            }
+            handle_backspace_key(line, &line_idx);
         }
         else if (ch >= 32 && ch <= 126)
         { // Printable character
-            if (line_idx < MAX_LINE_LENGTH - 1)
-            {
-                putchar(ch);
-                line[line_idx] = ch;
-                line_idx++;
-            }
+            handle_input(line, &line_idx, &ch);
         }
     }
 
