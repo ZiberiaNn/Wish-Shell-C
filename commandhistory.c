@@ -56,6 +56,32 @@ void navigate_command_history(char *history[], int *history_count, int *history_
     }
 }
 
+void add_command_to_history(char *history[], char *line, int *line_idx, int *history_count, int *history_idx)
+{
+    putchar('\n');
+
+    if (*line_idx > 0)
+    {
+        // Copy the current line to the history
+        if (*history_count == MAX_HISTORY)
+        {
+            free(history[0]);
+            memmove(history, history + 1, (MAX_HISTORY - 1) * sizeof(char *));
+            (*history_count)--;
+        }
+        history[*history_count] = malloc((*line_idx + 1) * sizeof(char));
+        strncpy(history[*history_count], line, *line_idx);
+        history[*history_count][*line_idx] = '\0';
+        (*history_count)++;
+        *history_idx = *history_count;
+
+        printf("Entered command: %s\n", line);
+    }
+
+    memset(line, 0, MAX_LINE_LENGTH);
+    *line_idx = 0;
+}
+
 int main()
 {
     char ch;
@@ -79,28 +105,7 @@ int main()
         }
         else if (ch == '\n')
         { // Enter key
-            putchar('\n');
-
-            if (line_idx > 0)
-            {
-                // Copy the current line to the history
-                if (history_count == MAX_HISTORY)
-                {
-                    free(history[0]);
-                    memmove(history, history + 1, (MAX_HISTORY - 1) * sizeof(char *));
-                    history_count--;
-                }
-                history[history_count] = malloc((line_idx + 1) * sizeof(char));
-                strncpy(history[history_count], line, line_idx);
-                history[history_count][line_idx] = '\0';
-                history_count++;
-                history_idx = history_count;
-
-                printf("Entered command: %s\n", line);
-            }
-
-            memset(line, 0, MAX_LINE_LENGTH);
-            line_idx = 0;
+            add_command_to_history(history, line, &line_idx, &history_count, &history_idx);
             printf("> ");
             fflush(stdout);
         }
