@@ -11,7 +11,6 @@
 #define MAX_HISTORY 10
 #define MAX_LINE_LENGTH 256
 
-
 void set_terminal_raw_mode(struct termios *old_term, struct termios *new_term)
 {
     // Save the current terminal settings
@@ -122,63 +121,71 @@ char *trimString(char *str)
 char *mypath[] = {"/bin/", "", NULL};
 char error_message[30] = "An error has occurred\n";
 
-int closedRedirection = 0; //flag para devolver el control al usuario después de redirección
-int stdout_copy=0; //salida para redirección
+int closedRedirection = 0; // flag para devolver el control al usuario después de redirección
+int stdout_copy = 0;       // salida para redirección
 
-//Función que nos permite imprimir el error
-void printError(){
-        write(STDERR_FILENO, error_message, strlen(error_message));
-        exit(0);        
+// Función que nos permite imprimir el error
+void printError()
+{
+    write(STDERR_FILENO, error_message, strlen(error_message));
+    exit(0);
 }
 
-//Función para la redirección
-void redirection (char* line){
-	int a=0;
-	char* redirections[sizeof(char)*512];
-	redirections[0]= strtok(strdup(line)," \n\t>");
-	while(redirections[a]!=NULL){
-			a++;
-			redirections[a]=strtok(NULL," \n\t>");
-	}
-	if(a==1){ 
-		printError();
-		exit(0);
-	}
-	int i=0;
-	char* arguments[sizeof(line)];
-	arguments[0]= strtok(line,"\n\t>");
-	while(arguments[i]!=NULL){
-			i++;
-			arguments[i]=strtok(NULL," \n\t>");
-	}
-	if(i>2){ 
-		printError();
-		exit(0);
-	}
-	int x=0;
-	char* command[sizeof(arguments[1])];
-	command[0]= strtok(arguments[1]," \n\t");
-	while(command[x]!=NULL){
-			x++;
-			command[x]=strtok(NULL," \n\t");
-	}
-	char *command_out=strdup(command[0]);
-	stdout_copy=dup(1);
-	int file_out=open(command_out,O_WRONLY|O_CREAT|O_TRUNC,0666);
-	int file_error=open(command_out,O_WRONLY|O_CREAT|O_TRUNC,0666);
-	fflush(stdout);
-	dup2(file_out,STDOUT_FILENO);
-	dup2(file_error,STDERR_FILENO);
-	close(file_out);
-	close(file_error);
-	closedRedirection = 1;
-	if(file_out==-1 || file_error==-1 || x>1 || i>2){
-			printError();
-			exit(0);
-	}
-	arguments[i+1]=NULL;
-	command[x+1]=NULL;
-	strcpy(line,arguments[0]);
+// Función para la redirección
+void redirection(char *line)
+{
+    int a = 0;
+    char *redirections[sizeof(char) * 512];
+    redirections[0] = strtok(strdup(line), " \n\t>");
+    while (redirections[a] != NULL)
+    {
+        a++;
+        redirections[a] = strtok(NULL, " \n\t>");
+    }
+    if (a == 1)
+    {
+        printError();
+        exit(0);
+    }
+    int i = 0;
+    char *arguments[sizeof(line)];
+    arguments[0] = strtok(line, "\n\t>");
+    while (arguments[i] != NULL)
+    {
+        i++;
+        arguments[i] = strtok(NULL, " \n\t>");
+    }
+    if (i > 2)
+    {
+        printError();
+        exit(0);
+    }
+    int x = 0;
+    char *command[sizeof(arguments[1])];
+    command[0] = strtok(arguments[1], " \n\t");
+    while (command[x] != NULL)
+    {
+        x++;
+        command[x] = strtok(NULL, " \n\t");
+    }
+    char *command_out = strdup(command[0]);
+    stdout_copy = dup(1);
+    int file_out = open(command_out, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    int file_error = open(command_out, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    fflush(stdout);
+    dup2(file_out, STDOUT_FILENO);
+    dup2(file_error, STDERR_FILENO);
+    close(file_out);
+    close(file_error);
+    closedRedirection = 1;
+    if (file_out == -1 || file_error == -1 || x > 1 || i > 2)
+    {
+        printError();
+        exit(0);
+    }
+    arguments[i + 1] = NULL;
+    command[x + 1] = NULL;
+    strcpy(line, arguments[0]);
 }
 
 int main(int argc, char *argv[])
@@ -216,9 +223,10 @@ int main(int argc, char *argv[])
             exit(1);
         }
     }
-    //Si no está en batch mode, imprime wish> 
+    // Si no está en batch mode, imprime wish>
     else if (argc == 1)
     {
+        set_terminal_raw_mode(&old_term, &new_term);
         printf("wish> ");
     }
     // Unending loop to read input
@@ -228,7 +236,6 @@ int main(int argc, char *argv[])
         {
             ch = getchar();
 
-            set_terminal_raw_mode(&old_term, &new_term);
             if (ch == '\033')
             { // Escape sequence
                 navigate_command_history(history, line, &history_count, &history_idx, &line_idx, &ch);
@@ -246,7 +253,6 @@ int main(int argc, char *argv[])
             { // Printable character
                 handle_input(line, &line_idx, &ch);
             }
-            restore_terminal_mode(&old_term);
         }
         else if (argc == 2) // Si hay 2 argumentos, significa que se entro un archivo para el batchmode
         {
@@ -256,22 +262,23 @@ int main(int argc, char *argv[])
                 break;
             }
         }
-        //Modo de ejecución de comando (line). Se entra cuando se presiona Enter o cuando es Batchmode (argc==2)
+        // Modo de ejecución de comando (line). Se entra cuando se presiona Enter o cuando es Batchmode (argc==2)
         if (argc == 2 || ch == '\n')
         {
-            //Si no está en batch mode, imprime "wish> "
+            // Si no está en batch mode, imprime "wish> "
             if (argc == 1)
             {
                 printf("wish> ");
             }
 
-            //Reemplaza el último caracter de la línea por null (\0)
+            // Reemplaza el último caracter de la línea por null (\0)
             int newline_pos = strcspn(line, "\n");
             line[newline_pos] = '\0';
-            
-            if(strstr(line,">")!=NULL){
-			redirection(line);
-		    }
+
+            if (strstr(line, ">") != NULL)
+            {
+                redirection(line);
+            }
             // Se separa el comando del argumento
             command_args = line;
             command_args = strcat(command_args, " ");
@@ -347,18 +354,23 @@ int main(int argc, char *argv[])
                     printf("Command not found: %s\n", line);
                 }
             }
-            //Si no está en batch mode, limpia el anterior comando del input
+            // Si no está en batch mode, limpia el anterior comando del input
             if (argc == 1)
             {
                 memset(line, 0, MAX_LINE_LENGTH);
             }
         }
-        if(closedRedirection == 1){
-			dup2(stdout_copy,1);
-			close(stdout_copy);
-            stdout_copy=0;
+        if (closedRedirection == 1)
+        {
+            dup2(stdout_copy, 1);
+            close(stdout_copy);
+            stdout_copy = 0;
             closedRedirection = 0;
-		}
+        }
+    }
+    if (argc == 1)
+    {
+        restore_terminal_mode(&old_term);
     }
     free(command_args);
     free(line);
