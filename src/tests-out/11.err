@@ -1,4 +1,4 @@
-/bin/ls: no se puede acceder a 'tests/p2a-test > /tmp/output11': No existe el archivo o el directorio
-/bin/cat: /tmp/output11: No existe el archivo o el directorio
-/bin/rm: opción incorrecta -- « »
-Pruebe '/bin/rm --help' para más información.
+/bin/ls: cannot access 'tests/p2a-test > /tmp/output11': No such file or directory
+/bin/cat: /tmp/output11: No such file or directory
+/bin/rm: invalid option -- ' '
+Try '/bin/rm --help' for more information.
