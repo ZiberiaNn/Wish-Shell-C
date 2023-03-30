@@ -48,6 +48,8 @@ void execute_path(char *newpath)
         i++;
     }
     // Si el objeto "newpath" no existe en la variable "mypath", se inserta
-    mypath[i] = newpath;
+    mypath[i] = malloc(strlen(newpath) + 1);
+    strcpy(mypath[i], newpath);
     mypath[i+1] = NULL;
+
 }

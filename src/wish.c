@@ -281,7 +281,6 @@ int main(int argc, char *argv[])
             }
             // Se separa el comando del argumento
             command_args = line;
-            command_args = strcat(command_args, " ");
             command_args = trimString(line); // Elimina espacios en blanco
             command_string = strtok_r(command_args, " ", &command_args);
             if (command_string == NULL) // Si no se entra ningún comando, empieza el loop de nuevo
@@ -341,7 +340,6 @@ int main(int argc, char *argv[])
                         myargs[0] = strdup(specificpath);
                         myargs[1] = strdup(command_args);
                         myargs[2] = NULL;
-                        // TODO: Implementar validación de path al ejecutar LS(Test 3)
                         execvp(myargs[0], myargs);
                     }
                     else
