@@ -378,7 +378,7 @@ int main(int argc, char *argv[])
                             myargs[0] = strdup(specificpath);
                             myargs[1] = strdup(command_args);
                             myargs[2] = NULL;
-                            // Si el comando es /bin/ls, se ejecuta con execvp
+                            // Si el comando es /bin/ls, se ejecuta "ls"
                             if (strcmp(myargs[0], "/bin/ls") == 0)
                             {
                                 myargs[0] = "ls";
@@ -392,7 +392,7 @@ int main(int argc, char *argv[])
                     }
                     else
                     {
-                        printf("Command not found: %s\n", line);
+                        write(STDERR_FILENO, error_message, strlen(error_message));
                     }
                 }
             }

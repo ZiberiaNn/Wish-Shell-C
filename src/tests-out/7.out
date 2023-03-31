@@ -1,10 +1,8 @@
 paralell.c
+test-wish.sh
 tests
 tests-out
-test-wish.sh
 wish
 wish.c
 wish_utils.c
 wish_utils.h
-Command not found: p1.sh
-Command not found: p1.sh
