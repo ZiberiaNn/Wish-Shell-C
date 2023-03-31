@@ -98,13 +98,15 @@ void handle_input(char *line, int *line_idx, char *ch)
         (*line_idx)++;
     }
 }
-char* trimString(char* str)
+char *trimString(char *str)
 {
     int start = 0, end = strlen(str) - 1;
-    while (isspace(str[start])) {
+    while (isspace(str[start]))
+    {
         start++;
     }
-    while ((end >= start) && isspace(str[end])) {
+    while ((end >= start) && isspace(str[end]))
+    {
         end--;
     }
     str[end + 1] = '\0';
@@ -229,7 +231,7 @@ int main(int argc, char *argv[])
     ssize_t read;
 
     int newline_pos;
-    
+
     char *tokens[4];
     char *token;
     int i;
@@ -376,6 +378,11 @@ int main(int argc, char *argv[])
                             myargs[0] = strdup(specificpath);
                             myargs[1] = strdup(command_args);
                             myargs[2] = NULL;
+                            // Si el comando es /bin/ls, se ejecuta con execvp
+                            if (strcmp(myargs[0], "/bin/ls") == 0)
+                            {
+                                myargs[0] = "ls";
+                            }
                             execvp(myargs[0], myargs);
                         }
                         else
@@ -389,11 +396,11 @@ int main(int argc, char *argv[])
                     }
                 }
             }
-                            // Si no está en batch mode, limpia el anterior comando del input
-                if (argc == 1)
-                {
-                    memset(line, 0, MAX_LINE_LENGTH);
-                }
+            // Si no está en batch mode, limpia el anterior comando del input
+            if (argc == 1)
+            {
+                memset(line, 0, MAX_LINE_LENGTH);
+            }
         }
         if (closedRedirection == 1)
         {
