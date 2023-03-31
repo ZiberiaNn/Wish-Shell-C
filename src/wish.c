@@ -391,8 +391,12 @@ int main(int argc, char *argv[])
                         printf("Command not found: %s\n", line);
                     }
                 }
-
             }
+                            // Si no está en batch mode, limpia el anterior comando del input
+                if (argc == 1)
+                {
+                    memset(line, 0, MAX_LINE_LENGTH);
+                }
         }
         if (closedRedirection == 1)
         {
