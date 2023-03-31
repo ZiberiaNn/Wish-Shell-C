@@ -121,8 +121,8 @@ char *trimString(char *str)
 char *mypath[] = {"/bin/", "", NULL};
 char error_message[30] = "An error has occurred\n";
 
-int closedRedirection = 0; // flag para devolver el control al usuario después de redirección
-int stdout_copy = 0;       // salida para redirección
+int closedRedirection = 0; // flag para devolver el control al usuario y que pueda seguir interactuando con la terminal
+int stdout_copy = 0;       // Varaible usada para la salida del comando a un archivo
 
 // Función que nos permite imprimir el error
 void printError()
