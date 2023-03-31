@@ -28,6 +28,16 @@ void execute_cd(char *newpath)
 
 void execute_path(char *newpath)
 {
+    int fd = -1;
+    char **mp = mypath;
+    int i = 0;
+
+    while ((strcmp(*mp, "") != 0) && fd != 0)
+    {
+        mp++;
+        i++;
+    }
+
     // Valida que el formato del new path sea correcto (Debe terminar con "/")
     if (strchr(newpath, '/') == NULL)
     {
@@ -35,21 +45,8 @@ void execute_path(char *newpath)
         newpath = strcat(newpath, "/");
     }
 
-    // Insertar el objeto "newpath" en la variable "mypath"
-    int i = 0;
-    while (mypath[i] != NULL)
-    {
-        // Si el objeto "newpath" ya existe en la variable "mypath", no se inserta
-        if (strcmp(mypath[i], newpath) == 0)
-        {
-            fprintf(stderr, "Error: %s already exists in path\n", newpath);
-            return;
-        }
-        i++;
-    }
     // Si el objeto "newpath" no existe en la variable "mypath", se inserta
     mypath[i] = malloc(strlen(newpath) + 1);
     strcpy(mypath[i], newpath);
-    mypath[i+1] = NULL;
-
+    mypath[i + 1] = "";
 }

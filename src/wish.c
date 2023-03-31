@@ -374,7 +374,6 @@ int main(int argc, char *argv[])
                         else if (subprocess == 0)
                         {
                             char *myargs[3];
-
                             myargs[0] = strdup(specificpath);
                             myargs[1] = strdup(command_args);
                             myargs[2] = NULL;
