@@ -98,24 +98,17 @@ void handle_input(char *line, int *line_idx, char *ch)
         (*line_idx)++;
     }
 }
-char *trimString(char *str)
+char* trimString(char* str)
 {
-    char *end;
-    while (isspace((unsigned char)*str))
-    {
-        str++;
+    int start = 0, end = strlen(str) - 1;
+    while (isspace(str[start])) {
+        start++;
     }
-    if (*str == 0)
-    {
-        return str;
-    }
-    end = str + strlen(str) - 1;
-    while (end > str && isspace((unsigned char)*end))
-    {
+    while ((end >= start) && isspace(str[end])) {
         end--;
     }
-    end[1] = '\0';
-    return str;
+    str[end + 1] = '\0';
+    return &str[start];
 }
 
 char *mypath[] = {"/bin/", "", NULL};
