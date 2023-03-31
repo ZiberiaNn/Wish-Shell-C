@@ -113,7 +113,7 @@ char *trimString(char *str)
     return &str[start];
 }
 
-char *mypath[] = {"/bin/", "", NULL};
+char *mypath[] = {"/bin/", "", NULL, NULL, NULL, NULL};
 char error_message[30] = "An error has occurred\n";
 
 int closedRedirection = 0; // flag para devolver el control al usuario y que pueda seguir interactuando con la terminal
@@ -351,6 +351,7 @@ int main(int argc, char *argv[])
                 }
                 else if (strcmp(command_string, "path") == 0)
                 {
+                    command_args = trimString(command_args);
                     execute_path(command_args);
                 }
                 else

@@ -28,25 +28,38 @@ void execute_cd(char *newpath)
 
 void execute_path(char *newpath)
 {
-    int fd = -1;
-    char **mp = mypath;
-    int i = 0;
-
-    while ((strcmp(*mp, "") != 0) && fd != 0)
+    char *tokens[4];
+    char *token;
+    memset(tokens, 0, sizeof(tokens));
+    int c= 0;
+    token = strtok(newpath, " ");
+    while (token != NULL)
     {
-        mp++;
-        i++;
+        tokens[c] = token;
+        token = strtok(NULL, " ");
+        c++;
     }
-
-    // Valida que el formato del new path sea correcto (Debe terminar con "/")
-    if (strchr(newpath, '/') == NULL)
+    for (int j = 0; j < c; j++)
     {
-        // Si el formato del new path es incorrecto, añade un "/" al final
-        newpath = strcat(newpath, "/");
-    }
+        strcpy(newpath, tokens[j]);
+        int fd = -1;
+        char **mp = mypath;
+        int i = 0;
 
-    // Si el objeto "newpath" no existe en la variable "mypath", se inserta
-    mypath[i] = malloc(strlen(newpath) + 1);
-    strcpy(mypath[i], newpath);
-    mypath[i + 1] = "";
+        while ((strcmp(*mp, "") != 0) && fd != 0)
+        {
+            mp++;
+            i++;
+        }
+        // Si el objeto "newpath" no existe en la variable "mypath", se inserta
+        mypath[i] = malloc(strlen(newpath) + 1);
+        strcpy(mypath[i], newpath);
+                // Valida que el formato del new path sea correcto (Debe terminar con "/")
+        if (strchr(mypath[i], '/') == NULL)
+        {
+            // Si el formato del new path es incorrecto, añade un "/" al final
+            mypath[i] = strcat(mypath[i], "/");
+        }
+        mypath[i + 1] = "";
+    }
 }
