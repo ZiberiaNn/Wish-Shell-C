@@ -187,6 +187,27 @@ void redirection(char *line)
     command[x + 1] = NULL;
     strcpy(line, arguments[0]);
 }
+// void executeConcurrencyCommands(char *line)
+// {
+
+//     int processArray[j];
+//     for (int i = 0; i < j; i++)
+//     {
+//         // ejecutar comando y guardar el id del proceso
+//         int pid = executeCommand(commands[i]);
+//         processArray[i] = pid;
+//         for (int x = 0; x < j; x++)
+//         {
+//             int processStatus = 0;
+//             // suspende la ejecucion actual hasta que todos los hijos hayan terminado
+//             waitpid(processArray[x], &processStatus, 0);
+//             if (processStatus == 1)
+//             {
+//                 printError();
+//             }
+//         }
+//     }
+// }
 
 int main(int argc, char *argv[])
 {
@@ -274,88 +295,103 @@ int main(int argc, char *argv[])
             // Reemplaza el último caracter de la línea por null (\0)
             int newline_pos = strcspn(line, "\n");
             line[newline_pos] = '\0';
+            // inicializar array separando los comandos por el token &
+            char *delimiter = "&";
 
-            if (strstr(line, ">") != NULL)
+            // Creamos un array para almacenar los tokens
+            char *tokens[4];
+            int i = 0;
+
+            // Utilizamos strtok para dividir la cadena en tokens
+            char *token = strtok(line, delimiter);
+
+            while (token != NULL)
             {
-                redirection(line);
+                tokens[i++] = trimString(token);
+                token = strtok(NULL, delimiter);
             }
-            // Se separa el comando del argumento
-            command_args = line;
-            command_args = trimString(line); // Elimina espacios en blanco
-            command_string = strtok_r(command_args, " ", &command_args);
-            if (command_string == NULL) // Si no se entra ningún comando, empieza el loop de nuevo
+
+            // Imprimimos cada token
+            for (int j = 0; j < i; j++)
             {
-                continue;
-            }
-            else if (command_args[0] == 0 || command_args[0] == 32) // Si no se entra ningún argumento al comando, se coloca argumento "."
-            {
-                command_args = malloc(strlen(".") + 1);
-                strcpy(command_args, ".");
-            }
-            if (strcmp(command_string, "exit") == 0)
-            {
-                if (strcmp(command_args, ".") != 0)
+
+                if (strstr(line, ">") != NULL)
                 {
-                    write(STDERR_FILENO, error_message, strlen(error_message));
+                    redirection(line);
+                }
+                // Se separa el comando del argumento
+                command_args = trimString(tokens[j]);
+                command_string = strtok_r(command_args, " ", &command_args);
+                if (command_string == NULL) // Si no se entra ningún comando, empieza el loop de nuevo
+                {
                     continue;
                 }
-                execute_exit(0);
-            }
-            else if (strcmp(command_string, "cd") == 0)
-            {
-                // Al no tener argumentos, se coloca el argumento "." y se imprime un error
-                if (strcmp(command_args, ".") == 0)
+                else if (command_args[0] == 0 || command_args[0] == 32) // Si no se entra ningún argumento al comando, se coloca argumento "."
                 {
-                    write(STDERR_FILENO, error_message, strlen(error_message));
-                    continue;
+                    command_args = malloc(strlen(".") + 1);
+                    strcpy(command_args, ".");
                 }
-                execute_cd(command_args);
-            }
-            else if (strcmp(command_string, "path") == 0)
-            {
-                execute_path(command_args);
-            }
-            else
-            {
-                fd = -1;
-                char **mp = mypath;
-                char specificpath[MAX_LINE_LENGTH];
-                while ((strcmp(*mp, "") != 0) && fd != 0)
+                if (strcmp(command_string, "exit") == 0)
                 {
-                    strcpy(specificpath, *mp++);
-                    strncat(specificpath, command_string, strlen(command_string));
-                    fd = access(specificpath, X_OK);
+                    if (strcmp(command_args, ".") != 0)
+                    {
+                        write(STDERR_FILENO, error_message, strlen(error_message));
+                        continue;
+                    }
+                    execute_exit(0);
                 }
-                if (fd == 0)
+                else if (strcmp(command_string, "cd") == 0)
                 {
-                    int subprocess = fork();
-                    if (subprocess < 0)
+                    // Al no tener argumentos, se coloca el argumento "." y se imprime un error
+                    if (strcmp(command_args, ".") == 0)
                     {
-                        printf("Error launching the subprocess");
+                        write(STDERR_FILENO, error_message, strlen(error_message));
+                        continue;
                     }
-                    else if (subprocess == 0)
-                    {
-                        char *myargs[3];
-
-                        myargs[0] = strdup(specificpath);
-                        myargs[1] = strdup(command_args);
-                        myargs[2] = NULL;
-                        execvp(myargs[0], myargs);
-                    }
-                    else
-                    {
-                        wait(NULL);
-                    }
+                    execute_cd(command_args);
+                }
+                else if (strcmp(command_string, "path") == 0)
+                {
+                    execute_path(command_args);
                 }
                 else
                 {
-                    printf("Command not found: %s\n", line);
+                    fd = -1;
+                    char **mp = mypath;
+                    char specificpath[MAX_LINE_LENGTH];
+                    while ((strcmp(*mp, "") != 0) && fd != 0)
+                    {
+                        strcpy(specificpath, *mp++);
+                        strncat(specificpath, command_string, strlen(command_string));
+                        fd = access(specificpath, X_OK);
+                    }
+                    if (fd == 0)
+                    {
+                        int subprocess = fork();
+                        if (subprocess < 0)
+                        {
+                            printf("Error launching the subprocess");
+                        }
+                        else if (subprocess == 0)
+                        {
+                            char *myargs[3];
+
+                            myargs[0] = strdup(specificpath);
+                            myargs[1] = strdup(command_args);
+                            myargs[2] = NULL;
+                            execvp(myargs[0], myargs);
+                        }
+                        else
+                        {
+                            wait(NULL);
+                        }
+                    }
+                    else
+                    {
+                        printf("Command not found: %s\n", line);
+                    }
                 }
-            }
-            // Si no está en batch mode, limpia el anterior comando del input
-            if (argc == 1)
-            {
-                memset(line, 0, MAX_LINE_LENGTH);
+
             }
         }
         if (closedRedirection == 1)
