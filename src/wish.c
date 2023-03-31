@@ -235,6 +235,11 @@ int main(int argc, char *argv[])
     size_t len = 0;
     ssize_t read;
 
+    int newline_pos;
+    
+    char *tokens[4];
+    char *token;
+    int i;
     if (argc == 2) // Si hay 2 argumentos, significa que se entro un archivo para el batchmode
     {
         fp = fopen(argv[1], "r"); // Se intenta abrir el archivo que se entro como argumento
@@ -293,22 +298,21 @@ int main(int argc, char *argv[])
             }
 
             // Reemplaza el último caracter de la línea por null (\0)
-            int newline_pos = strcspn(line, "\n");
+            newline_pos = strcspn(line, "\n");
             line[newline_pos] = '\0';
             // inicializar array separando los comandos por el token &
-            char *delimiter = "&";
 
             // Creamos un array para almacenar los tokens
-            char *tokens[4];
-            int i = 0;
+            memset(tokens, 0, sizeof(tokens));
+            i = 0;
 
             // Utilizamos strtok para dividir la cadena en tokens
-            char *token = strtok(line, delimiter);
+            token = strtok(line, "&");
 
             while (token != NULL)
             {
                 tokens[i++] = trimString(token);
-                token = strtok(NULL, delimiter);
+                token = strtok(NULL, "&");
             }
 
             // Imprimimos cada token
